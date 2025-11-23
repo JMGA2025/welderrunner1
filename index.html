@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Welder Runner 1</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&family=Black+Ops+One&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #2c3e50; 
+            font-family: 'Roboto', sans-serif;
+            touch-action: none; 
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        #gameCanvas {
+            display: block;
+            width: 100%;
+            height: 100vh;
+            outline: none; 
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 20;
+        }
+
+        /* Pantalla de aviso de rotación */
+        #rotate-message {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #263238;
+            color: #f1c40f;
+            display: none; /* Se activa con JS */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .screen {
+            pointer-events: auto;
+            background: linear-gradient(135deg, #e0e0e0 0%, #cfcfcf 100%);
+            padding: 30px; /* Un poco menos padding para móviles */
+            border-radius: 8px;
+            box-shadow: 
+                0 0 0 4px #546e7a, 
+                0 0 0 8px #37474f, 
+                0 20px 50px rgba(0,0,0,0.5); 
+            color: #263238;
+            display: none;
+            max-width: 90%; /* Más ancho en móvil */
+            width: 420px;
+            position: relative;
+            transition: opacity 0.3s;
+        }
+
+        .screen::after, .screen::before {
+            content: '';
+            position: absolute;
+            width: 12px; height: 12px;
+            background: #90a4ae;
+            border-radius: 50%;
+            box-shadow: inset 1px 1px 2px rgba(0,0,0,0.3), 1px 1px 0 rgba(255,255,255,0.5);
+            top: 15px;
+        }
+        .screen::after { right: 15px; }
+        .screen::before { left: 15px; }
+
+        h1 {
+            font-family: 'Black Ops One', cursive;
+            font-size: 2rem; /* Ajustado para móvil */
+            margin: 10px 0 10px 0;
+            color: #d35400;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+            border-bottom: 3px solid #d35400;
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+        
+        p {
+            font-size: 1rem;
+            color: #455a64;
+            margin-bottom: 20px;
+            line-height: 1.4;
+            font-weight: 500;
+        }
+
+        /* MEJOR MARCA DISPLAY */
+        .high-score-label {
+            font-size: 0.9rem;
+            color: #546e7a;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: rgba(0,0,0,0.05);
+            padding: 5px 10px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        button {
+            background: linear-gradient(to bottom, #2980b9, #2c3e50);
+            border: none;
+            padding: 15px 25px;
+            font-size: 1.1rem;
+            color: white;
+            font-weight: 900;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: transform 0.1s, filter 0.2s;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 6px 0 #1a252f, 0 10px 10px rgba(0,0,0,0.3);
+            border: 2px solid #34495e;
+            position: relative;
+            overflow: hidden;
+            margin-top: 10px; /* Espacio extra */
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 6px;
+            background: repeating-linear-gradient(
+                45deg,
+                #f1c40f,
+                #f1c40f 10px,
+                #2c3e50 10px,
+                #2c3e50 20px
+            );
+        }
+
+        button:active { transform: translateY(4px); box-shadow: 0 2px 0 #1a252f; }
+        button:hover { filter: brightness(1.1); }
+
+        #start-screen { display: block; }
+        
+        /* HUD */
+        #hud-question {
+            position: absolute;
+            top: 15%; /* Un poco más bajo para evitar el notch del móvil */
+            left: 50%;
+            transform: translateX(-50%);
+            background: #37474f; 
+            color: #eceff1;
+            padding: 10px 20px;
+            border-radius: 2px;
+            font-size: 1.2rem; /* Letra ajustada */
+            font-weight: 700;
+            white-space: nowrap;
+            z-index: 10;
+            display: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border: 2px solid #546e7a;
+            border-bottom: 5px solid #f39c12; 
+            max-width: 90%; /* Evitar que se salga */
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #hud-lives {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 1.5rem;
+            letter-spacing: 4px;
+            filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.3));
+        }
+        
+        #hud-score {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-family: 'Black Ops One', cursive;
+            font-size: 1.2rem;
+            color: #eceff1;
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        #hud-combo {
+            position: absolute;
+            top: 50px;
+            right: 10px;
+            font-weight: 900;
+            font-size: 1rem;
+            color: #ff5722;
+            display: none;
+            text-shadow: 0 0 10px rgba(255, 87, 34, 0.6);
+            font-style: italic;
+        }
+
+        .controls-hint {
+            margin-top: 15px;
+            font-size: 0.8rem;
+            color: #546e7a;
+            background: rgba(0,0,0,0.05);
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px dashed #b0bec5;
+        }
+
+        .pop-anim { animation: slideDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes slideDown {
+            from { transform: translate(-50%, -30px); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Mensaje de rotación -->
+    <div id="rotate-message">
+        <h1>⚠ ATENCIÓN ⚠</h1>
+        <p>Este juego requiere el móvil en horizontal.</p>
+        <p>Por favor, gira tu dispositivo.</p>
+        <div style="font-size: 3rem;">⟳</div>
+    </div>
+
+    <!-- HUD -->
+    <div id="hud-question">PREGUNTA</div>
+    <div id="hud-lives">❤️❤️❤️</div>
+    <div id="hud-score">PTS: 0</div>
+    <div id="hud-combo">🔥 RACHA 🔥</div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- UI Overlay -->
+    <div id="ui-layer">
+        <div id="start-screen" class="screen">
+            <h1>WELDER RUNNER 1</h1>
+            <div class="high-score-label">MEJOR MARCA: <span id="best-score-display">0</span></div>
+            <p>Empareja los conceptos de soldadura.<br>Salta o espera.</p>
+            <button onclick="initGameSequence()">ENTRAR AL TALLER</button>
+            <div class="controls-hint">PC: Espacio / ↑ &nbsp;|&nbsp; Móvil: Toca la pantalla</div>
+        </div>
+
+        <div id="game-over-screen" class="screen">
+            <h1 style="color: #c62828; border-color: #c62828;">TURNO FALLIDO</h1>
+            <p>Puntuación Final: <span id="final-score" style="font-weight:900; color:#263238; font-size: 1.4em;">0</span></p>
+            <button onclick="initGameSequence()">REPETIR TURNO</button>
+        </div>
+        
+        <div id="win-screen" class="screen">
+            <h1 style="color: #f39c12; border-color: #f39c12;">¡CERTIFICADO!</h1>
+            <p>Has demostrado dominio de estos conceptos.</p>
+            <button onclick="initGameSequence()">NUEVO TURNO</button>
+        </div>
+    </div>
+
+<script>
+    // --- 0. SISTEMA DE AUDIO (Web Audio API) ---
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx;
+
+    function initAudio() {
+        if (!audioCtx) audioCtx = new AudioContext();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function playSound(type) {
+        if (!audioCtx) return;
+        
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        const now = audioCtx.currentTime;
+
+        if (type === 'jump') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(400, now);
+            osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
+            gainNode.gain.setValueAtTime(0.3, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            osc.start(now);
+            osc.stop(now + 0.1);
+        } 
+        else if (type === 'weld') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(150, now);
+            osc.frequency.linearRampToValueAtTime(100, now + 0.2);
+            gainNode.gain.setValueAtTime(0.1, now);
+            gainNode.gain.linearRampToValueAtTime(0.01, now + 0.2);
+            osc.start(now);
+            osc.stop(now + 0.2);
+        }
+        else if (type === 'hit') {
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(100, now);
+            osc.frequency.exponentialRampToValueAtTime(40, now + 0.15);
+            gainNode.gain.setValueAtTime(0.2, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+            osc.start(now);
+            osc.stop(now + 0.15);
+        }
+    }
+
+    // --- 1. DATOS ---
+    const originalQuestions = [
+        { q: "SMAW", a: "111", bad: "141" }, 
+        { q: "E6013", a: "Rutilo", bad: "Básico" }, 
+        { q: "Junta a tope", a: "G (Groove)", bad: "F (Fillet)" }, 
+        { q: "Heterogéneo", a: "No funde piezas", bad: "Funde base" },
+        { q: "Junta ángulo", a: "F (Fillet)", bad: "G (Groove)" },
+        { q: "7016", a: "Básico", bad: "Rutilo" },
+        { q: "Hidrógeno", a: "Grietas", bad: "Protección" },
+        { q: "Acero", a: "< 1,7% C", bad: "> 2% C" },
+        { q: "Fundición", a: "1,7% - 6.7% C", bad: "< 1% C" },
+        { q: "Acero", a: "Fe + C", bad: "Al + Mg" },
+        { q: "Estanqueidad", a: "Ventaja", bad: "Defecto" },
+        { q: "SMAW", a: "Manual", bad: "Automático" },
+        { q: "Articulada", a: "Bisagra", bad: "Rígida" },
+        { q: "SAN", a: "Atmósfera Natural", bad: "Gas Inerte" }
+    ];
+
+    let gameQuestions = []; 
+
+    // --- 2. CONFIGURACIÓN ---
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    let gameState = 'START'; 
+    let frames = 0;
+    let score = 0;
+    let lives = 3;
+    let combo = 0;
+    // VELOCIDAD BAJADA PARA MÓVIL (De 5 a 3.5)
+    let gameSpeed = 3.5; 
+    let spawnTimer = 0;
+    
+    let shakeDuration = 0;
+    let countdownVal = 3;
+    let totalQuestions = originalQuestions.length;
+    let questionsSolved = 0;
+
+    let highScore = localStorage.getItem('welderRunnerHighScore') || 0;
+    document.getElementById('best-score-display').innerText = highScore;
+
+    let width, height;
+    let groundHeight = 100;
+
+    const COLORS = {
+        bgStart: '#cfd8dc',   
+        bgEnd: '#90a4ae',     
+        pillar: '#546e7a',    
+        ground: '#263238',    
+        hazardY: '#f1c40f',   
+        hazardB: '#2c3e50',   
+        playerBody: '#3498db',
+        playerHeat1: '#ff9800',
+        playerHeat2: '#ff3d00',
+        block: '#ffb300',     
+        blockText: '#212121'
+    };
+
+    let player = {
+        x: 50, y: 0, w: 45, h: 75, // Jugador un poco más a la izquierda para tener más tiempo
+        dy: 0, jumpPower: -17, gravity: 0.85, 
+        grounded: false
+    };
+
+    let obstacles = []; 
+    let currentQObj = null; 
+    let particles = []; 
+    let floatingTexts = []; 
+
+    // --- 3. DIBUJO ---
+    
+    function drawRoundedRect(x, y, w, h, radius, color) {
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.roundRect(x, y, w, h, radius);
+        ctx.fill();
+    }
+
+    function drawWorkshopBackground() {
+        let grad = ctx.createLinearGradient(0, 0, 0, height);
+        grad.addColorStop(0, COLORS.bgStart);
+        grad.addColorStop(1, COLORS.bgEnd);
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, width, height);
+
+        let pillarW = 60;
+        let gap = 400; 
+        let offset = (frames * (gameSpeed * 0.2)) % gap;
+        
+        ctx.fillStyle = COLORS.pillar;
+        ctx.strokeStyle = "#37474f";
+        ctx.lineWidth = 4;
+
+        for(let i = width - offset + pillarW; i > -pillarW; i -= gap) {
+            ctx.fillRect(i, 0, pillarW, height - groundHeight);
+            ctx.strokeRect(i, 0, pillarW, height - groundHeight);
+            
+            ctx.fillStyle = "#37474f";
+            for(let j=20; j < height - groundHeight; j+=60) {
+                ctx.beginPath(); ctx.arc(i + 10, j, 3, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(i + pillarW - 10, j, 3, 0, Math.PI*2); ctx.fill();
+            }
+            ctx.fillStyle = COLORS.pillar; 
+        }
+    }
+
+    function drawIndustrialFloor() {
+        ctx.fillStyle = COLORS.ground;
+        ctx.fillRect(0, height - groundHeight, width, groundHeight);
+        
+        let stripHeight = 15;
+        let stripeW = 30;
+        let floorY = height - groundHeight;
+        
+        ctx.fillStyle = COLORS.hazardB;
+        ctx.fillRect(0, floorY, width, stripHeight);
+        
+        let stripeOffset = (frames * gameSpeed) % (stripeW * 2);
+        
+        ctx.fillStyle = COLORS.hazardY;
+        ctx.beginPath();
+        for(let i = -stripeW * 2; i < width + stripeW; i += stripeW * 2) {
+            let x = i - stripeOffset;
+            ctx.moveTo(x, floorY);
+            ctx.lineTo(x + stripeW, floorY);
+            ctx.lineTo(x + stripeW - 10, floorY + stripHeight);
+            ctx.lineTo(x - 10, floorY + stripHeight);
+            ctx.fill();
+        }
+        ctx.closePath();
+    }
+
+    function drawWelder(x, y, w, h) {
+        if(player.grounded) {
+             ctx.fillStyle = "rgba(0,0,0,0.3)";
+             ctx.beginPath();
+             ctx.ellipse(x + w/2, y + h, w/2 + 5, 6, 0, 0, Math.PI*2);
+             ctx.fill();
+        }
+
+        let bodyColor = COLORS.playerBody;
+        let heatGlow = false;
+        if (combo >= 5) { bodyColor = COLORS.playerHeat2; heatGlow = true; }
+        else if (combo >= 3) { bodyColor = COLORS.playerHeat1; }
+
+        if (heatGlow) {
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = "#ff3d00";
+        }
+
+        drawRoundedRect(x + 5, y + h*0.6, w/2 - 5, h*0.4, 5, '#1565c0'); 
+        drawRoundedRect(x + w/2, y + h*0.6, w/2 - 5, h*0.4, 5, '#1565c0'); 
+        drawRoundedRect(x, y + h*0.25, w, h*0.45, 8, bodyColor); 
+        
+        ctx.shadowBlur = 0;
+
+        ctx.fillStyle = '#263238'; 
+        ctx.beginPath();
+        ctx.roundRect(x - 2, y, w + 4, h*0.35, 8);
+        ctx.fill();
+
+        ctx.fillStyle = '#00e676'; 
+        if(frames % 60 < 30 && gameState === 'PLAYING') ctx.fillStyle = '#69f0ae'; 
+        ctx.fillRect(x + 5, y + h*0.12, w - 10, h*0.12);
+        
+        if (gameState === 'PLAYING') {
+            let sparkRate = (combo >= 5) ? 8 : 0;
+            if (sparkRate > 0 && frames % sparkRate === 0) {
+                 ctx.fillStyle = '#ffff00';
+                 ctx.fillRect(x + w, y + h*0.6, 4, 4);
+            }
+        }
+    }
+
+    function drawProgressBar() {
+        let barW = Math.min(300, width * 0.6); // Responsivo
+        let barH = 10;
+        let barX = (width - barW) / 2;
+        let barY = 25;
+
+        ctx.fillStyle = "rgba(0,0,0,0.3)";
+        ctx.fillRect(barX, barY, barW, barH);
+        ctx.strokeStyle = "rgba(255,255,255,0.3)";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(barX, barY, barW, barH);
+
+        let progress = questionsSolved / totalQuestions;
+        let fillW = Math.max(0, Math.min(barW, barW * progress)); 
+        
+        ctx.fillStyle = "#00e676"; 
+        ctx.fillRect(barX, barY, fillW, barH);
+    }
+
+    function checkOrientation() {
+        const rotateMsg = document.getElementById('rotate-message');
+        // Si el alto es mayor que el ancho, estamos en vertical (portrait)
+        if (window.innerHeight > window.innerWidth) {
+            rotateMsg.style.display = 'flex';
+            // Pausar si está jugando? Opcional, pero mejor solo mostrar aviso
+        } else {
+            rotateMsg.style.display = 'none';
+        }
+        
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+        player.y = height - groundHeight - player.h; 
+    }
+    window.addEventListener('resize', checkOrientation);
+    // Llamada inicial
+    setTimeout(checkOrientation, 100);
+
+    // --- 4. LÓGICA ---
+    
+    function initGameSequence() {
+        initAudio();
+
+        gameQuestions = [...originalQuestions];
+        gameQuestions.sort(() => Math.random() - 0.5);
+        totalQuestions = originalQuestions.length;
+        questionsSolved = 0;
+        
+        score = 0;
+        lives = 3;
+        combo = 0;
+        gameSpeed = 3.5; // VELOCIDAD REDUCIDA
+        obstacles = [];
+        particles = [];
+        floatingTexts = [];
+        shakeDuration = 0;
+        
+        player.y = height - groundHeight - player.h;
+        player.dy = 0;
+        player.grounded = true;
+        
+        document.getElementById('hud-score').innerText = "PTS: 0";
+        document.getElementById('hud-lives').innerText = "❤️❤️❤️";
+        document.getElementById('hud-combo').style.display = "none";
+        document.querySelectorAll('.screen').forEach(el => el.style.display = 'none');
+        
+        gameState = 'COUNTDOWN';
+        countdownVal = 3;
+        
+        let countInterval = setInterval(() => {
+            countdownVal--;
+            if(countdownVal <= 0) {
+                clearInterval(countInterval);
+                startGameplay();
+            }
+        }, 800);
+    }
+
+    function startGameplay() {
+        gameState = 'PLAYING';
+        document.getElementById('hud-question').style.display = 'block';
+        spawnNextQuestion();
+    }
+
+    function spawnNextQuestion() {
+        if (gameQuestions.length === 0) {
+            winGame();
+            return;
+        }
+        currentQObj = gameQuestions.pop();
+        const hudQ = document.getElementById('hud-question');
+        hudQ.innerText = currentQObj.q;
+        
+        hudQ.classList.remove('pop-anim');
+        void hudQ.offsetWidth; 
+        hudQ.classList.add('pop-anim');
+        
+        // Dar un poco más de tiempo antes de que aparezca el bloque
+        spawnTimer = 100; 
+    }
+
+    function createObstacles() {
+        let correctIsTop = Math.random() > 0.5;
+        let groundY = height - groundHeight - 70; 
+        let airY = height - groundHeight - 200; 
+        
+        // Ancho adaptativo para móvil
+        let obstacleWidth = Math.min(240, width * 0.45); 
+
+        obstacles.push({
+            x: width, y: correctIsTop ? airY : groundY,
+            w: obstacleWidth, h: 70,
+            text: currentQObj.a, type: 'correct'
+        });
+
+        obstacles.push({
+            x: width, y: correctIsTop ? groundY : airY, 
+            w: obstacleWidth, h: 70,
+            text: currentQObj.bad, type: 'wrong'
+        });
+    }
+
+    function addFloatingText(x, y, text, color) {
+        floatingTexts.push({
+            x: x, y: y, text: text, color: color,
+            life: 60, dy: -2 
+        });
+    }
+
+    function spawnParticles(x, y, color, count = 10) {
+        for(let i=0; i<count; i++) { 
+            particles.push({
+                x: x, y: y,
+                vx: (Math.random() - 0.5) * 8,
+                vy: (Math.random() - 1) * 8,
+                gravity: 0.5,
+                life: 40, 
+                color: color
+            });
+        }
+    }
+
+    function update() {
+        if (gameState !== 'PLAYING') return;
+
+        if (shakeDuration > 0) shakeDuration--;
+
+        if (!player.grounded) {
+            player.dy += player.gravity;
+            player.y += player.dy;
+        }
+
+        if (player.y + player.h > height - groundHeight) {
+            player.y = height - groundHeight - player.h;
+            player.dy = 0;
+            player.grounded = true;
+        } else {
+            if(player.dy !== 0) player.grounded = false;
+        }
+
+        if (spawnTimer > 0) {
+            spawnTimer--;
+            if (spawnTimer === 0) createObstacles();
+        }
+
+        for (let i = obstacles.length - 1; i >= 0; i--) {
+            let obs = obstacles[i];
+            obs.x -= gameSpeed;
+
+            // Colisión
+            if (
+                player.x < obs.x + obs.w &&
+                player.x + player.w > obs.x &&
+                player.y < obs.y + obs.h &&
+                player.y + player.h > obs.y
+            ) {
+                if (obs.type === 'correct') {
+                    score += 100;
+                    combo++;
+                    questionsSolved++;
+                    
+                    playSound('weld');
+
+                    spawnParticles(player.x + player.w/2, player.y + player.h/2, '#ffffff', 10);
+                    spawnParticles(player.x + player.w/2, player.y + player.h/2, '#f1c40f', 10);
+                    
+                    let comboText = combo > 1 ? `+100 (x${combo})` : "+100";
+                    addFloatingText(player.x, player.y, comboText, "#00e676");
+                    document.getElementById('hud-score').innerText = "PTS: " + score;
+                    
+                    if(combo >= 3) {
+                        document.getElementById('hud-combo').style.display = "block";
+                        document.getElementById('hud-combo').innerText = "🔥 RACHA x" + combo + " 🔥";
+                    }
+
+                    spawnNextQuestion(); 
+                } else {
+                    lives--;
+                    combo = 0;
+                    document.getElementById('hud-combo').style.display = "none";
+                    
+                    playSound('hit');
+
+                    shakeDuration = 15; 
+                    spawnParticles(player.x + player.w/2, player.y + player.h/2, '#ff1744', 20);
+                    addFloatingText(player.x, player.y, "¡FALLO!", "#ff1744");
+                    
+                    let displayLives = Math.max(0, lives); 
+                    let hearts = "❤️".repeat(displayLives);
+                    document.getElementById('hud-lives').innerText = hearts;
+                    
+                    gameQuestions.unshift(currentQObj);
+                    spawnNextQuestion();
+                    
+                    if (lives <= 0) {
+                        gameOver();
+                    }
+                }
+                obstacles = [];
+                return; 
+            }
+
+            if (obs.x + obs.w < 0) {
+                obstacles.splice(i, 1);
+                if (obstacles.length === 0) {
+                     gameQuestions.unshift(currentQObj); 
+                     spawnTimer = 40; 
+                }
+            }
+        }
+
+        for (let i = particles.length - 1; i >= 0; i--) {
+            let p = particles[i];
+            p.x += p.vx; 
+            p.y += p.vy;
+            if(p.gravity) p.vy += p.gravity;
+            
+            p.life--;
+            if (p.life <= 0) particles.splice(i, 1);
+        }
+
+        for (let i = floatingTexts.length - 1; i >= 0; i--) {
+            let ft = floatingTexts[i];
+            ft.y += ft.dy;
+            ft.life--;
+            if (ft.life <= 0) floatingTexts.splice(i, 1);
+        }
+    }
+
+    function draw() {
+        ctx.save();
+        if (shakeDuration > 0) {
+            let dx = (Math.random() - 0.5) * 10;
+            let dy = (Math.random() - 0.5) * 10;
+            ctx.translate(dx, dy);
+        }
+
+        drawWorkshopBackground();
+        drawIndustrialFloor();
+        drawWelder(player.x, player.y, player.w, player.h);
+
+        obstacles.forEach(obs => {
+            ctx.fillStyle = "rgba(0,0,0,0.2)";
+            ctx.fillRect(obs.x + 5, obs.y + 5, obs.w, obs.h);
+            
+            ctx.fillStyle = COLORS.block;
+            ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
+            
+            ctx.strokeStyle = "rgba(0,0,0,0.2)";
+            ctx.lineWidth = 3;
+            ctx.strokeRect(obs.x + 3, obs.y + 3, obs.w - 6, obs.h - 6);
+            
+            ctx.fillStyle = "#4e342e";
+            ctx.fillRect(obs.x + 5, obs.y + 5, 4, 4);
+            ctx.fillRect(obs.x + obs.w - 9, obs.y + 5, 4, 4);
+            ctx.fillRect(obs.x + 5, obs.y + obs.h - 9, 4, 4);
+            ctx.fillRect(obs.x + obs.w - 9, obs.y + obs.h - 9, 4, 4);
+
+            ctx.fillStyle = COLORS.blockText;
+            // Letra más grande en móvil si el bloque es estrecho
+            let fontSize = Math.max(16, Math.min(22, obs.w / 8)); 
+            ctx.font = `bold ${fontSize}px Roboto, sans-serif`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(obs.text, obs.x + obs.w/2, obs.y + obs.h/2);
+        });
+
+        particles.forEach(p => {
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.gravity ? 3 : 4, 0, Math.PI*2);
+            ctx.fill();
+        });
+
+        floatingTexts.forEach(ft => {
+            ctx.fillStyle = ft.color;
+            ctx.font = "900 24px Roboto";
+            ctx.strokeStyle = "black";
+            ctx.lineWidth = 3;
+            ctx.strokeText(ft.text, ft.x + 20, ft.y);
+            ctx.fillText(ft.text, ft.x + 20, ft.y);
+        });
+
+        if(gameState === 'PLAYING') drawProgressBar();
+
+        if(gameState === 'COUNTDOWN') {
+            ctx.fillStyle = "rgba(0,0,0,0.6)";
+            ctx.fillRect(0,0,width,height);
+            
+            ctx.fillStyle = "#f1c40f";
+            ctx.font = "900 100px 'Black Ops One', cursive";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.strokeStyle = "black";
+            ctx.lineWidth = 4;
+            ctx.strokeText(countdownVal, width/2, height/2);
+            ctx.fillText(countdownVal, width/2, height/2);
+            
+            ctx.font = "bold 30px Roboto";
+            ctx.fillStyle = "white";
+            ctx.lineWidth = 0;
+            ctx.fillText("¡PREPARADOS!", width/2, height/2 + 80);
+        }
+
+        ctx.restore(); 
+    }
+
+    function loop() {
+        requestAnimationFrame(loop);
+        frames++;
+        
+        if(gameState === 'PLAYING' || gameState === 'COUNTDOWN') {
+            update();
+            draw();
+        }
+    }
+
+    function saveHighScore() {
+        if (score > highScore) {
+            highScore = score;
+            localStorage.setItem('welderRunnerHighScore', highScore);
+            document.getElementById('best-score-display').innerText = highScore;
+        }
+    }
+
+    function gameOver() {
+        saveHighScore();
+        gameState = 'GAMEOVER';
+        document.getElementById('hud-question').style.display = 'none';
+        document.getElementById('hud-combo').style.display = "none";
+        document.getElementById('game-over-screen').style.display = 'block';
+        document.getElementById('final-score').innerText = score;
+    }
+
+    function winGame() {
+        saveHighScore();
+        gameState = 'WIN';
+        document.getElementById('hud-question').style.display = 'none';
+        document.getElementById('hud-combo').style.display = "none";
+        document.getElementById('win-screen').style.display = 'block';
+    }
+
+    // Iniciar loop global
+    checkOrientation();
+    loop();
+
+    // --- INPUTS ---
+    function jump() {
+        if (gameState !== 'PLAYING') return;
+        if (player.grounded) {
+            playSound('jump'); 
+            player.dy = player.jumpPower;
+            player.grounded = false;
+        }
+    }
+
+    function handleInput(e) {
+        if (gameState !== 'PLAYING') return;
+        const isJumpKey = e.code === 'Space' || e.code === 'ArrowUp' || e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W';
+        if (isJumpKey) { e.preventDefault(); jump(); }
+    }
+
+    window.addEventListener('keydown', handleInput);
+    window.addEventListener('touchstart', (e) => {
+        if(e.target.tagName !== 'BUTTON') { e.preventDefault(); jump(); }
+    }, {passive: false});
+    window.addEventListener('mousedown', (e) => {
+        if(e.target.tagName !== 'BUTTON') { jump(); }
+    });
+
+</script>
+</body>
+</html>
