@@ -236,7 +236,7 @@
     <div id="rotate-message">
         <h1>⚠ ATENCIÓN ⚠</h1>
         <p>Este juego requiere el móvil en horizontal.</p>
-        <p>Por favor, gira tu dispositivo.</p>
+        <p>Por favor, gira tu dispositivo o amplía la ventana.</p>
         <div style="font-size: 3rem;">⟳</div>
     </div>
 
@@ -272,6 +272,22 @@
     </div>
 
 <script>
+    // --- POLYFILL ROUNDRECT (Para compatibilidad) ---
+    if (!CanvasRenderingContext2D.prototype.roundRect) {
+        CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+            if (w < 2 * r) r = w / 2;
+            if (h < 2 * r) r = h / 2;
+            this.beginPath();
+            this.moveTo(x + r, y);
+            this.arcTo(x + w, y, x + w, y + h, r);
+            this.arcTo(x + w, y + h, x, y + h, r);
+            this.arcTo(x, y + h, x, y, r);
+            this.arcTo(x, y, x + w, y, r);
+            this.closePath();
+            return this;
+        };
+    }
+
     // --- 0. SISTEMA DE AUDIO (Web Audio API) ---
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     let audioCtx;
@@ -335,8 +351,10 @@
         { q: "Acero", a: "Fe + C", bad: "Al + Mg" },
         { q: "Estanqueidad", a: "Ventaja", bad: "Defecto" },
         { q: "SMAW", a: "Manual", bad: "Automático" },
-        { q: "Articulada", a: "Bisagra", bad: "Rígida" },
-        { q: "SAN", a: "Atmósfera Natural", bad: "Gas Inerte" }
+        { q: "SAN", a: "Atmósfera Natural", bad: "Gas Inerte" },
+        { q: "Polaridad Directa", a: "DC-", bad: "DC+" },
+        { q: "Polaridad Inversa", a: "DC+", bad: "DC-" },
+        { q: "Corriente Alterna", a: "AC (~)", bad: "DC (=)" }
     ];
 
     let gameQuestions = []; 
@@ -367,7 +385,7 @@
 
     const COLORS = {
         bgStart: '#cfd8dc',   
-        bgEnd: '#90a4ae',     
+        bgEnd: '#90a4ae',      
         pillar: '#546e7a',    
         ground: '#263238',    
         hazardY: '#f1c40f',   
@@ -375,7 +393,7 @@
         playerBody: '#3498db',
         playerHeat1: '#ff9800',
         playerHeat2: '#ff3d00',
-        block: '#ffb300',     
+        block: '#ffb300',      
         blockText: '#212121'
     };
 
@@ -395,7 +413,13 @@
     function drawRoundedRect(x, y, w, h, radius, color) {
         ctx.fillStyle = color;
         ctx.beginPath();
-        ctx.roundRect(x, y, w, h, radius);
+        // Usamos el método polifilleado o nativo
+        if(ctx.roundRect) {
+             ctx.roundRect(x, y, w, h, radius);
+        } else {
+             // Fallback manual muy básico si todo falla
+             ctx.rect(x, y, w, h);
+        }
         ctx.fill();
     }
 
@@ -479,7 +503,8 @@
 
         ctx.fillStyle = '#263238'; 
         ctx.beginPath();
-        ctx.roundRect(x - 2, y, w + 4, h*0.35, 8);
+        if(ctx.roundRect) ctx.roundRect(x - 2, y, w + 4, h*0.35, 8);
+        else ctx.rect(x - 2, y, w + 4, h*0.35);
         ctx.fill();
 
         ctx.fillStyle = '#00e676'; 
@@ -519,7 +544,6 @@
         // Si el alto es mayor que el ancho, estamos en vertical (portrait)
         if (window.innerHeight > window.innerWidth) {
             rotateMsg.style.display = 'flex';
-            // Pausar si está jugando? Opcional, pero mejor solo mostrar aviso
         } else {
             rotateMsg.style.display = 'none';
         }
@@ -887,4 +911,3 @@
 </script>
 </body>
 </html>
-
