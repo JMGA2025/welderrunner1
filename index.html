@@ -105,6 +105,44 @@
             font-weight: 500;
         }
 
+        /* --- CARTEL INDUSTRIAL INICIO --- */
+        .industrial-sign-container {
+            background: radial-gradient(circle, #455a64 0%, #263238 100%);
+            border: 4px solid #37474f;
+            padding: 15px 25px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 5px 15px rgba(0,0,0,0.4);
+            display: inline-block;
+        }
+
+        .bolt {
+            position: absolute;
+            width: 10px; height: 10px;
+            background: linear-gradient(135deg, #cfd8dc, #78909c);
+            border-radius: 50%;
+            border: 1px solid #455a64;
+            box-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+        }
+        .bolt::after {
+            content: ''; position: absolute; top: 50%; left: 15%; right: 15%; height: 2px;
+            background: #455a64; transform: translateY(-50%) rotate(45deg); opacity: 0.7;
+        }
+        .tl { top: 6px; left: 6px; }
+        .tr { top: 6px; right: 6px; }
+        .bl { bottom: 6px; left: 6px; }
+        .br { bottom: 6px; right: 6px; }
+
+        .cifp-title {
+            font-family: 'Black Ops One', cursive;
+            font-size: 2.2rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            line-height: 1;
+            filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.5));
+        }
+
         /* MEJOR MARCA DISPLAY */
         .high-score-label {
             font-size: 0.9rem;
@@ -158,28 +196,60 @@
 
         #start-screen { display: block; }
         
-        /* HUD */
+        /* --- ESTILO HUD (PANEL DE PREGUNTA) --- */
         #hud-question {
             position: absolute;
-            top: 15%; /* Un poco más bajo para evitar el notch del móvil */
+            top: 12%; /* MÁS ARRIBA PARA NO TAPAR */
             left: 50%;
             transform: translateX(-50%);
-            background: #37474f; 
-            color: #eceff1;
-            padding: 10px 20px;
-            border-radius: 2px;
-            font-size: 1.2rem; /* Letra ajustada */
-            font-weight: 700;
-            white-space: nowrap;
+            
+            /* Caja Metálica COMPACTA */
+            min-width: 200px; /* Reducido de 320px */
+            max-width: 85%;
+            padding: 10px 40px; /* Reducido el padding */
+            
+            background: radial-gradient(circle at center, #263238 20%, #1a1a1a 100%);
+            border: 3px solid #546e7a; /* Borde un poco más fino */
+            border-radius: 8px; /* Radio más pequeño */
+            
+            /* Sombras para profundidad */
+            box-shadow: 
+                0 5px 15px rgba(0,0,0,0.6), 
+                inset 0 0 10px rgba(0,0,0,0.9), 
+                0 0 0 2px #37474f; 
+
+            /* Texto Digital */
+            color: #4fc3f7; /* Azul cian brillante */
+            font-family: 'Black Ops One', cursive;
+            font-size: 1.3rem; /* Letra un poco más pequeña */
+            text-align: center;
+            text-shadow: 0 0 8px rgba(79, 195, 247, 0.6); 
+            
             z-index: 10;
             display: none;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            border: 2px solid #546e7a;
-            border-bottom: 5px solid #f39c12; 
-            max-width: 90%; /* Evitar que se salga */
+            white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
+
+        /* Tornillos decorativos en el HUD */
+        #hud-question::before, #hud-question::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 10px; height: 10px; /* Tornillos más pequeños */
+            background: linear-gradient(135deg, #cfd8dc, #90a4ae);
+            border-radius: 50%;
+            border: 1px solid #455a64;
+            box-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        #hud-question::before { left: 10px; }
+        #hud-question::after { right: 10px; }
+        /* Ranura del tornillo */
+        #hud-question::before { background-image: linear-gradient(45deg, transparent 45%, #546e7a 45%, #546e7a 55%, transparent 55%); }
+        #hud-question::after { background-image: linear-gradient(-45deg, transparent 45%, #546e7a 45%, #546e7a 55%, transparent 55%); }
+
 
         #hud-lives {
             position: absolute;
@@ -251,6 +321,16 @@
     <!-- UI Overlay -->
     <div id="ui-layer">
         <div id="start-screen" class="screen">
+            <!-- CARTEL INDUSTRIAL CIFP CERDEÑO (Inicio) -->
+            <div class="industrial-sign-container">
+                <div class="bolt tl"></div><div class="bolt tr"></div>
+                <div class="bolt bl"></div><div class="bolt br"></div>
+                <div class="cifp-title">
+                    <span style="color: #29b6f6;">CIFP</span> 
+                    <span style="color: #ef5350;">CER</span><span style="color: #ffee58;">DEÑO</span>
+                </div>
+            </div>
+
             <h1>WELDER RUNNER 1</h1>
             <div class="high-score-label">MEJOR MARCA: <span id="best-score-display">0</span></div>
             <p>Empareja los conceptos de soldadura.<br>Salta o espera.</p>
@@ -259,12 +339,32 @@
         </div>
 
         <div id="game-over-screen" class="screen">
+            <!-- CARTEL INDUSTRIAL CIFP CERDEÑO (Fin - Derrota) -->
+            <div class="industrial-sign-container">
+                <div class="bolt tl"></div><div class="bolt tr"></div>
+                <div class="bolt bl"></div><div class="bolt br"></div>
+                <div class="cifp-title">
+                    <span style="color: #29b6f6;">CIFP</span> 
+                    <span style="color: #ef5350;">CER</span><span style="color: #ffee58;">DEÑO</span>
+                </div>
+            </div>
+
             <h1 style="color: #c62828; border-color: #c62828;">TURNO FALLIDO</h1>
             <p>Puntuación Final: <span id="final-score" style="font-weight:900; color:#263238; font-size: 1.4em;">0</span></p>
             <button onclick="initGameSequence()">REPETIR TURNO</button>
         </div>
         
         <div id="win-screen" class="screen">
+            <!-- CARTEL INDUSTRIAL CIFP CERDEÑO (Fin - Victoria) -->
+            <div class="industrial-sign-container">
+                <div class="bolt tl"></div><div class="bolt tr"></div>
+                <div class="bolt bl"></div><div class="bolt br"></div>
+                <div class="cifp-title">
+                    <span style="color: #29b6f6;">CIFP</span> 
+                    <span style="color: #ef5350;">CER</span><span style="color: #ffee58;">DEÑO</span>
+                </div>
+            </div>
+
             <h1 style="color: #f39c12; border-color: #f39c12;">¡CERTIFICADO!</h1>
             <p>Has demostrado dominio de estos conceptos.</p>
             <button onclick="initGameSequence()">NUEVO TURNO</button>
@@ -272,7 +372,7 @@
     </div>
 
 <script>
-    // --- POLYFILL ROUNDRECT (Para compatibilidad) ---
+    // --- POLYFILL ROUNDRECT ---
     if (!CanvasRenderingContext2D.prototype.roundRect) {
         CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
             if (w < 2 * r) r = w / 2;
@@ -345,13 +445,13 @@
         { q: " Soldeo Heterogéneo", a: "No se funde las piezas", bad: "Funde base" },
         { q: "Junta en ángulo", a: "F (Fillet)", bad: "G (Groove)" },
         { q: "E7016", a: "Básico", bad: "Rutilo" },
-        { q: "Hidrógeno", a: "Grietas", bad: "Protección" },
-        { q: "Acero", a: "< 1,7% C", bad: "> 2% C" },
-        { q: "Fundición", a: "1,7% C - 6.7% C", bad: "< 1% C" },
-        { q: "Acero", a: "Fe + C", bad: "Al + Mg" },
+        { q: "Hidrógeno", a: "Grietas", bad: "Poros" },
+        { q: "Acero", a: "< 1,7% C", bad: "1,7% C - 6.7% C" },
+        { q: "Fundición", a: "1,7% C - 6.7% C", bad: "< 1,7% C" },
+        { q: "Acero", a: "Fe + C", bad: "Fe + O" },
         { q: "Estanqueidad", a: "Ventaja", bad: "Defecto" },
         { q: "SMAW", a: "Manual", bad: "Automático" },
-        { q: "SAN", a: "Atmósfera Natural", bad: "Gas Inerte" },
+        { q: "SAN", a: "Atmósfera Natural", bad: "Atmósfera Protegida" },
         { q: "Polaridad Directa", a: "DC-", bad: "DC+" },
         { q: "Polaridad Inversa", a: "DC+", bad: "DC-" },
         { q: "Corriente Alterna", a: "AC (~)", bad: "DC (=)" }
@@ -368,7 +468,6 @@
     let score = 0;
     let lives = 3;
     let combo = 0;
-    // AUMENTO DE VELOCIDAD (De 3.5 a 5.0)
     let gameSpeed = 5.0; 
     let spawnTimer = 0;
     
@@ -398,7 +497,7 @@
     };
 
     let player = {
-        x: 50, y: 0, w: 45, h: 75, // Jugador un poco más a la izquierda para tener más tiempo
+        x: 50, y: 0, w: 45, h: 75,
         dy: 0, jumpPower: -17, gravity: 0.85, 
         grounded: false
     };
@@ -413,14 +512,19 @@
     function drawRoundedRect(x, y, w, h, radius, color) {
         ctx.fillStyle = color;
         ctx.beginPath();
-        // Usamos el método polifilleado o nativo
         if(ctx.roundRect) {
              ctx.roundRect(x, y, w, h, radius);
         } else {
-             // Fallback manual muy básico si todo falla
              ctx.rect(x, y, w, h);
         }
         ctx.fill();
+    }
+
+    // --- NUEVA FUNCIÓN: DIBUJAR CARTEL EN CANVAS ---
+    function drawCanvasIndustrialSign(x, y) {
+        // Esta función ya no se usa en el loop de juego, 
+        // pero la dejo por si se necesita para efectos visuales estáticos.
+        // (El cartel ahora está en el HTML)
     }
 
     function drawWorkshopBackground() {
@@ -434,20 +538,21 @@
         let gap = 400; 
         let offset = (frames * (gameSpeed * 0.2)) % gap;
         
-        ctx.fillStyle = COLORS.pillar;
-        ctx.strokeStyle = "#37474f";
         ctx.lineWidth = 4;
 
         for(let i = width - offset + pillarW; i > -pillarW; i -= gap) {
+            // Pilar
+            ctx.fillStyle = COLORS.pillar;
+            ctx.strokeStyle = "#37474f";
             ctx.fillRect(i, 0, pillarW, height - groundHeight);
             ctx.strokeRect(i, 0, pillarW, height - groundHeight);
             
+            // Remaches del pilar
             ctx.fillStyle = "#37474f";
             for(let j=20; j < height - groundHeight; j+=60) {
                 ctx.beginPath(); ctx.arc(i + 10, j, 3, 0, Math.PI*2); ctx.fill();
                 ctx.beginPath(); ctx.arc(i + pillarW - 10, j, 3, 0, Math.PI*2); ctx.fill();
             }
-            ctx.fillStyle = COLORS.pillar; 
         }
     }
 
@@ -541,7 +646,6 @@
 
     function checkOrientation() {
         const rotateMsg = document.getElementById('rotate-message');
-        // Si el alto es mayor que el ancho, estamos en vertical (portrait)
         if (window.innerHeight > window.innerWidth) {
             rotateMsg.style.display = 'flex';
         } else {
@@ -553,7 +657,6 @@
         player.y = height - groundHeight - player.h; 
     }
     window.addEventListener('resize', checkOrientation);
-    // Llamada inicial
     setTimeout(checkOrientation, 100);
 
     // --- 4. LÓGICA ---
@@ -569,7 +672,7 @@
         score = 0;
         lives = 3;
         combo = 0;
-        gameSpeed = 5.0; // VELOCIDAD AUMENTADA
+        gameSpeed = 5.0; 
         obstacles = [];
         particles = [];
         floatingTexts = [];
@@ -615,7 +718,6 @@
         void hudQ.offsetWidth; 
         hudQ.classList.add('pop-anim');
         
-        // Dar un poco más de tiempo antes de que aparezca el bloque
         spawnTimer = 100; 
     }
 
@@ -624,7 +726,6 @@
         let groundY = height - groundHeight - 70; 
         let airY = height - groundHeight - 200; 
         
-        // Ancho adaptativo para móvil
         let obstacleWidth = Math.min(240, width * 0.45); 
 
         obstacles.push({
@@ -797,7 +898,6 @@
             ctx.fillRect(obs.x + obs.w - 9, obs.y + obs.h - 9, 4, 4);
 
             ctx.fillStyle = COLORS.blockText;
-            // Letra más grande en móvil si el bloque es estrecho
             let fontSize = Math.max(16, Math.min(22, obs.w / 8)); 
             ctx.font = `bold ${fontSize}px Roboto, sans-serif`;
             ctx.textAlign = "center";
@@ -880,7 +980,6 @@
         document.getElementById('win-screen').style.display = 'block';
     }
 
-    // Iniciar loop global
     checkOrientation();
     loop();
 
