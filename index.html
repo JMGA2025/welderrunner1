@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Welder Runner 1</title>
+    <title>Welder Runner: Pruebas de Taller</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&family=Black+Ops+One&display=swap');
 
@@ -58,7 +58,7 @@
         .screen {
             pointer-events: auto;
             background: linear-gradient(135deg, #e0e0e0 0%, #cfcfcf 100%);
-            padding: 30px; /* Un poco menos padding para móviles */
+            padding: 30px; 
             border-radius: 8px;
             box-shadow: 
                 0 0 0 4px #546e7a, 
@@ -66,7 +66,7 @@
                 0 20px 50px rgba(0,0,0,0.5); 
             color: #263238;
             display: none;
-            max-width: 90%; /* Más ancho en móvil */
+            max-width: 90%; 
             width: 420px;
             position: relative;
             transition: opacity 0.3s;
@@ -86,7 +86,7 @@
 
         h1 {
             font-family: 'Black Ops One', cursive;
-            font-size: 2rem; /* Ajustado para móvil */
+            font-size: 2rem; 
             margin: 10px 0 10px 0;
             color: #d35400;
             text-transform: uppercase;
@@ -105,7 +105,7 @@
             font-weight: 500;
         }
 
-        /* --- CARTEL INDUSTRIAL INICIO --- */
+        /* --- CARTEL INDUSTRIAL --- */
         .industrial-sign-container {
             background: radial-gradient(circle, #455a64 0%, #263238 100%);
             border: 4px solid #37474f;
@@ -143,7 +143,7 @@
             filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.5));
         }
 
-        /* MEJOR MARCA DISPLAY */
+        /* MEJOR MARCA */
         .high-score-label {
             font-size: 0.9rem;
             color: #546e7a;
@@ -174,7 +174,7 @@
             border: 2px solid #34495e;
             position: relative;
             overflow: hidden;
-            margin-top: 10px; /* Espacio extra */
+            margin-top: 10px; 
         }
 
         button::after {
@@ -196,32 +196,29 @@
 
         #start-screen { display: block; }
         
-        /* --- ESTILO HUD (PANEL DE PREGUNTA) --- */
+        /* --- ESTILO HUD COMPACTO --- */
         #hud-question {
             position: absolute;
-            top: 12%; /* MÁS ARRIBA PARA NO TAPAR */
+            top: 12%; 
             left: 50%;
             transform: translateX(-50%);
             
-            /* Caja Metálica COMPACTA */
-            min-width: 200px; /* Reducido de 320px */
+            min-width: 200px;
             max-width: 85%;
-            padding: 10px 40px; /* Reducido el padding */
+            padding: 10px 40px; 
             
             background: radial-gradient(circle at center, #263238 20%, #1a1a1a 100%);
-            border: 3px solid #546e7a; /* Borde un poco más fino */
-            border-radius: 8px; /* Radio más pequeño */
+            border: 3px solid #546e7a; 
+            border-radius: 8px; 
             
-            /* Sombras para profundidad */
             box-shadow: 
                 0 5px 15px rgba(0,0,0,0.6), 
                 inset 0 0 10px rgba(0,0,0,0.9), 
                 0 0 0 2px #37474f; 
 
-            /* Texto Digital */
-            color: #4fc3f7; /* Azul cian brillante */
+            color: #4fc3f7; 
             font-family: 'Black Ops One', cursive;
-            font-size: 1.3rem; /* Letra un poco más pequeña */
+            font-size: 1.3rem; 
             text-align: center;
             text-shadow: 0 0 8px rgba(79, 195, 247, 0.6); 
             
@@ -232,24 +229,20 @@
             text-overflow: ellipsis;
         }
 
-        /* Tornillos decorativos en el HUD */
+        /* Tornillos HUD */
         #hud-question::before, #hud-question::after {
             content: '';
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            width: 10px; height: 10px; /* Tornillos más pequeños */
+            width: 10px; height: 10px; 
             background: linear-gradient(135deg, #cfd8dc, #90a4ae);
             border-radius: 50%;
             border: 1px solid #455a64;
             box-shadow: 1px 1px 2px rgba(0,0,0,0.5);
         }
-        #hud-question::before { left: 10px; }
-        #hud-question::after { right: 10px; }
-        /* Ranura del tornillo */
-        #hud-question::before { background-image: linear-gradient(45deg, transparent 45%, #546e7a 45%, #546e7a 55%, transparent 55%); }
-        #hud-question::after { background-image: linear-gradient(-45deg, transparent 45%, #546e7a 45%, #546e7a 55%, transparent 55%); }
-
+        #hud-question::before { left: 10px; background-image: linear-gradient(45deg, transparent 45%, #546e7a 45%, #546e7a 55%, transparent 55%); }
+        #hud-question::after { right: 10px; background-image: linear-gradient(-45deg, transparent 45%, #546e7a 45%, #546e7a 55%, transparent 55%); }
 
         #hud-lives {
             position: absolute;
@@ -321,7 +314,7 @@
     <!-- UI Overlay -->
     <div id="ui-layer">
         <div id="start-screen" class="screen">
-            <!-- CARTEL INDUSTRIAL CIFP CERDEÑO (Inicio) -->
+            <!-- CARTEL INDUSTRIAL (Inicio) -->
             <div class="industrial-sign-container">
                 <div class="bolt tl"></div><div class="bolt tr"></div>
                 <div class="bolt bl"></div><div class="bolt br"></div>
@@ -331,15 +324,15 @@
                 </div>
             </div>
 
-            <h1>WELDER RUNNER 1</h1>
+            <h1>WELDER RUNNER</h1>
             <div class="high-score-label">MEJOR MARCA: <span id="best-score-display">0</span></div>
-            <p>Empareja los conceptos de soldadura.<br>Salta o espera.</p>
+            <p>Empareja los conceptos de soldadura.<br>Elige la respuesta correcta saltando o esperando.</p>
             <button onclick="initGameSequence()">ENTRAR AL TALLER</button>
             <div class="controls-hint">PC: Espacio / ↑ &nbsp;|&nbsp; Móvil: Toca la pantalla</div>
         </div>
 
         <div id="game-over-screen" class="screen">
-            <!-- CARTEL INDUSTRIAL CIFP CERDEÑO (Fin - Derrota) -->
+            <!-- CARTEL INDUSTRIAL (Derrota) -->
             <div class="industrial-sign-container">
                 <div class="bolt tl"></div><div class="bolt tr"></div>
                 <div class="bolt bl"></div><div class="bolt br"></div>
@@ -355,7 +348,7 @@
         </div>
         
         <div id="win-screen" class="screen">
-            <!-- CARTEL INDUSTRIAL CIFP CERDEÑO (Fin - Victoria) -->
+            <!-- CARTEL INDUSTRIAL (Victoria) -->
             <div class="industrial-sign-container">
                 <div class="bolt tl"></div><div class="bolt tr"></div>
                 <div class="bolt bl"></div><div class="bolt br"></div>
@@ -366,7 +359,7 @@
             </div>
 
             <h1 style="color: #f39c12; border-color: #f39c12;">¡CERTIFICADO!</h1>
-            <p>Has demostrado dominio de estos conceptos.</p>
+            <p>Has superado todas las pruebas de conocimiento.</p>
             <button onclick="initGameSequence()">NUEVO TURNO</button>
         </div>
     </div>
@@ -437,24 +430,25 @@
         }
     }
 
-    // --- 1. DATOS ---
+    // --- 1. DATOS (LISTA DE PREGUNTAS ACTUALIZADA CON ZAT) ---
     const originalQuestions = [
         { q: "SMAW", a: "111", bad: "141" }, 
         { q: "E6013", a: "Rutilo", bad: "Básico" }, 
         { q: "Junta a tope", a: "G (Groove)", bad: "F (Fillet)" }, 
-        { q: " Soldeo Heterogéneo", a: "No se funde las piezas", bad: "Funde base" },
+        { q: "Soldeo Heterogéneo", a: "No se funde las piezas", bad: "Funde base" },
         { q: "Junta en ángulo", a: "F (Fillet)", bad: "G (Groove)" },
         { q: "E7016", a: "Básico", bad: "Rutilo" },
         { q: "Hidrógeno", a: "Grietas", bad: "Poros" },
-        { q: "Acero", a: "< 1,7% C", bad: "1,7% C - 6.7% C" },
-        { q: "Fundición", a: "1,7% C - 6.7% C", bad: "< 1,7% C" },
-        { q: "Acero", a: "Fe + C", bad: "Fe + O" },
+        { q: "Acero (Carbono)", a: "< 1,7% C", bad: "1,7% C - 6.7% C" },
+        { q: "Fundición (Carbono)", a: "1,7% C - 6.7% C", bad: "< 1,7% C" },
+        { q: "Acero (Composición)", a: "Fe + C", bad: "Fe + O" },
         { q: "Estanqueidad", a: "Ventaja", bad: "Defecto" },
-        { q: "SMAW", a: "Manual", bad: "Automático" },
+        { q: "SMAW (Tipo)", a: "Manual", bad: "Automático" },
         { q: "SAN", a: "Atmósfera Natural", bad: "Atmósfera Protegida" },
         { q: "Polaridad Directa", a: "DC-", bad: "DC+" },
         { q: "Polaridad Inversa", a: "DC+", bad: "DC-" },
-        { q: "Corriente Alterna", a: "AC (~)", bad: "DC (=)" }
+        { q: "Corriente Alterna", a: "AC (~)", bad: "DC (=)" },
+        { q: "ZAT", a: "Z. Afectada Térmica", bad: "Metal Base" }
     ];
 
     let gameQuestions = []; 
@@ -518,13 +512,6 @@
              ctx.rect(x, y, w, h);
         }
         ctx.fill();
-    }
-
-    // --- NUEVA FUNCIÓN: DIBUJAR CARTEL EN CANVAS ---
-    function drawCanvasIndustrialSign(x, y) {
-        // Esta función ya no se usa en el loop de juego, 
-        // pero la dejo por si se necesita para efectos visuales estáticos.
-        // (El cartel ahora está en el HTML)
     }
 
     function drawWorkshopBackground() {
@@ -600,22 +587,26 @@
             ctx.shadowColor = "#ff3d00";
         }
 
-        drawRoundedRect(x + 5, y + h*0.6, w/2 - 5, h*0.4, 5, '#1565c0'); 
-        drawRoundedRect(x + w/2, y + h*0.6, w/2 - 5, h*0.4, 5, '#1565c0'); 
-        drawRoundedRect(x, y + h*0.25, w, h*0.45, 8, bodyColor); 
+        // Cuerpo (Buzo de trabajo)
+        drawRoundedRect(x + 5, y + h*0.6, w/2 - 5, h*0.4, 5, '#1565c0'); // Pierna Izq
+        drawRoundedRect(x + w/2, y + h*0.6, w/2 - 5, h*0.4, 5, '#1565c0'); // Pierna Der
+        drawRoundedRect(x, y + h*0.25, w, h*0.45, 8, bodyColor); // Torso
         
         ctx.shadowBlur = 0;
 
+        // Cabeza (Careta de soldar)
         ctx.fillStyle = '#263238'; 
         ctx.beginPath();
         if(ctx.roundRect) ctx.roundRect(x - 2, y, w + 4, h*0.35, 8);
         else ctx.rect(x - 2, y, w + 4, h*0.35);
         ctx.fill();
 
+        // Visor de la careta
         ctx.fillStyle = '#00e676'; 
         if(frames % 60 < 30 && gameState === 'PLAYING') ctx.fillStyle = '#69f0ae'; 
         ctx.fillRect(x + 5, y + h*0.12, w - 10, h*0.12);
         
+        // Efecto soldadura (chispas en la mano)
         if (gameState === 'PLAYING') {
             let sparkRate = (combo >= 5) ? 8 : 0;
             if (sparkRate > 0 && frames % sparkRate === 0) {
@@ -626,7 +617,7 @@
     }
 
     function drawProgressBar() {
-        let barW = Math.min(300, width * 0.6); // Responsivo
+        let barW = Math.min(300, width * 0.6); 
         let barH = 10;
         let barX = (width - barW) / 2;
         let barY = 25;
@@ -724,7 +715,8 @@
     function createObstacles() {
         let correctIsTop = Math.random() > 0.5;
         let groundY = height - groundHeight - 70; 
-        let airY = height - groundHeight - 200; 
+        // FIX RESPONSIVE: Bajamos 35px más la opción de arriba para evitar la barra del navegador
+        let airY = height - groundHeight - 175; 
         
         let obstacleWidth = Math.min(240, width * 0.45); 
 
@@ -980,6 +972,7 @@
         document.getElementById('win-screen').style.display = 'block';
     }
 
+    // Iniciar loop global
     checkOrientation();
     loop();
 
